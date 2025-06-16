@@ -2,7 +2,7 @@ import React from 'react';
 import { Strategy } from '../types';
 import { WearRateInput } from './WearRateInput';
 import { MaintenanceSchedule } from './MaintenanceSchedule';
-import { Settings, DollarSign, Clock } from 'lucide-react';
+import { Settings, DollarSign } from 'lucide-react';
 
 interface StrategyEditorProps {
   strategy: Strategy;

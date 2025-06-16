@@ -3,8 +3,9 @@ import { Strategy, WearAccumulation, CostAccumulation } from '../types';
 // Calculate wear accumulation over time
 export function calculateWearAccumulation(strategy: Strategy): WearAccumulation[] {
   const accumulation: WearAccumulation[] = [];
-  const hoursPerPeriod = strategy.operatingHoursPerPeriod;
-  const periods = Math.ceil(strategy.totalHours / hoursPerPeriod);
+  // Track periods and hours per period for potential future use
+  // const hoursPerPeriod = strategy.operatingHoursPerPeriod;
+  // const periods = Math.ceil(strategy.totalHours / hoursPerPeriod);
   
   // Initialize current thicknesses
   let currentThickness = {

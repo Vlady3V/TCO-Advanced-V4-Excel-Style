@@ -12,7 +12,7 @@ export const StrategyComparison: React.FC<StrategyComparisonProps> = ({ strategi
   // Combine data for comparison chart
   const combinedData = costData[0]?.map((item, index) => {
     const dataPoint: any = { hours: item.hours };
-    strategies.forEach((strategy, strategyIndex) => {
+    strategies.forEach((_, strategyIndex) => {
       if (costData[strategyIndex] && costData[strategyIndex][index]) {
         dataPoint[`strategy${strategyIndex}`] = costData[strategyIndex][index].costPerHour;
       }

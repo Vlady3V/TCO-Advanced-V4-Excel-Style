@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, Trash2, Copy, Download, Upload, Calculator } from 'lucide-react';
 import { Strategy } from './types';
 import { defaultStrategies } from './data/defaultStrategies';
