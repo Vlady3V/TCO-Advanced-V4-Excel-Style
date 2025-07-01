@@ -4,3 +4,7 @@ export { WearProgressionChart } from './WearProgressionChart';
 export { CostAnalysisChart } from './CostAnalysisChart';
 export { StrategyComparison } from './StrategyComparison';
 export { StrategyEditor } from './StrategyEditor';
+export { ErrorBoundary } from './ErrorBoundary';
+export { LoadingSpinner, LoadingOverlay } from './LoadingSpinner';
+export { ConfirmDialog } from './ConfirmDialog';
+export { FormField } from './FormField';

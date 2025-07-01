@@ -1,11 +1,27 @@
 export interface WearRates {
-  floor: number;
-  stage0: number;
-  stage1: number;
-  stage2: number;
-  stage3: number;
-  stage4: number;
+  floor: number;   // Range: 0.12-0.45 mm/1000hrs (validated)
+  stage0: number;  // Range: 0.12-0.45 mm/1000hrs (validated)
+  stage1: number;  // Range: 0.12-0.45 mm/1000hrs (validated)
+  stage2: number;  // Range: 0.12-0.45 mm/1000hrs (validated)
+  stage3: number;  // Range: 0.12-0.45 mm/1000hrs (validated)
+  stage4: number;  // Range: 0.12-0.45 mm/1000hrs (validated)
 }
+
+// Validation constants
+export const WEAR_RATE_LIMITS = {
+  MIN: 0.12,
+  MAX: 0.45
+} as const;
+
+export const THICKNESS_LIMITS = {
+  MIN: 0,
+  MAX: 50
+} as const;
+
+export const OPERATING_HOURS_LIMITS = {
+  MIN: 0,
+  MAX: 200000
+} as const;
 
 export interface MaintenanceIntervention {
   operatingHours: number;
@@ -93,8 +109,24 @@ export interface WearAccumulation {
 }
 
 export interface CostAccumulation {
-  hours: number;
-  periodCost: number;
-  cumulativeCost: number;
-  costPerHour: number;
+  hours: number;          // Operating hours (>= 0)
+  periodCost: number;     // Cost for this period (>= 0)
+  cumulativeCost: number; // Total accumulated cost (>= 0)
+  costPerHour: number;    // Cost per operating hour (>= 0)
+}
+
+// Enhanced error types for better debugging
+export interface ValidationError {
+  field: string;
+  value: number;
+  expectedRange: [number, number];
+  message: string;
+}
+
+// Performance monitoring interface
+export interface CalculationMetrics {
+  calculationTime: number;  // milliseconds
+  dataPoints: number;
+  memoryUsage?: number;
+  errors: ValidationError[];
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Plus, Trash2, Copy, Download, Upload, Calculator } from 'lucide-react';
 import { Strategy } from './types';
 import { defaultStrategies } from './data/defaultStrategies';
@@ -6,7 +6,10 @@ import {
   StrategyEditor, 
   WearProgressionChart, 
   CostAnalysisChart, 
-  StrategyComparison 
+  StrategyComparison,
+  ErrorBoundary,
+  LoadingOverlay,
+  ConfirmDialog
 } from './components';
 import { 
   calculateWearAccumulation, 
@@ -19,10 +22,26 @@ function App() {
   const [strategies, setStrategies] = useState<Strategy[]>(defaultStrategies);
   const [activeTab, setActiveTab] = useState<'edit' | 'analysis' | 'comparison'>('edit');
   const [selectedStrategyIndex, setSelectedStrategyIndex] = useState(0);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   
-  // Calculate data for all strategies
-  const wearData = strategies.map(strategy => calculateWearAccumulation(strategy));
-  const costData = strategies.map(strategy => calculateCostAccumulation(strategy));
+  // Memoize expensive calculations with loading state
+  const { wearData, costData } = useMemo(() => {
+    setIsCalculating(true);
+    try {
+      const wear = strategies.map(strategy => calculateWearAccumulation(strategy));
+      const cost = strategies.map(strategy => calculateCostAccumulation(strategy));
+      return { wearData: wear, costData: cost };
+    } finally {
+      // Use setTimeout to show loading state briefly for UX feedback
+      setTimeout(() => setIsCalculating(false), 100);
+    }
+  }, [strategies]);
 
   const addStrategy = () => {
     const newStrategy: Strategy = {
@@ -34,15 +53,22 @@ function App() {
     setSelectedStrategyIndex(strategies.length);
   };
 
-  const deleteStrategy = (index: number) => {
-    if (strategies.length > 1) {
-      const newStrategies = strategies.filter((_, i) => i !== index);
-      setStrategies(newStrategies);
-      if (selectedStrategyIndex >= newStrategies.length) {
-        setSelectedStrategyIndex(newStrategies.length - 1);
+  const deleteStrategy = useCallback((index: number) => {
+    if (strategies.length <= 1) return;
+    
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Strategy',
+      message: `Are you sure you want to delete "${strategies[index].name}"? This action cannot be undone.`,
+      onConfirm: () => {
+        const newStrategies = strategies.filter((_, i) => i !== index);
+        setStrategies(newStrategies);
+        if (selectedStrategyIndex >= newStrategies.length) {
+          setSelectedStrategyIndex(newStrategies.length - 1);
+        }
       }
-    }
-  };
+    });
+  }, [strategies, selectedStrategyIndex]);
 
   const duplicateStrategy = (index: number) => {
     const strategyToDuplicate = strategies[index];
@@ -82,7 +108,12 @@ function App() {
           setStrategies(importedStrategies);
           setSelectedStrategyIndex(0);
         } catch (error) {
-          alert('Invalid file format. Please select a valid TCO strategies JSON file.');
+          setConfirmDialog({
+            isOpen: true,
+            title: 'Import Error',
+            message: 'Invalid file format. Please select a valid TCO strategies JSON file. The file should contain an array of strategy objects with the correct structure.',
+            onConfirm: () => {}
+          });
         }
       };
       reader.readAsText(file);
@@ -90,7 +121,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -215,12 +247,13 @@ function App() {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'edit' && (
-          <StrategyEditor
-            strategy={strategies[selectedStrategyIndex]}
-            onChange={(updatedStrategy) => updateStrategy(selectedStrategyIndex, updatedStrategy)}
-          />
-        )}
+        <LoadingOverlay isLoading={isCalculating} text="Calculating TCO data...">
+          {activeTab === 'edit' && (
+            <StrategyEditor
+              strategy={strategies[selectedStrategyIndex]}
+              onChange={(updatedStrategy) => updateStrategy(selectedStrategyIndex, updatedStrategy)}
+            />
+          )}
 
         {activeTab === 'analysis' && (
           <div className="space-y-6">
@@ -275,14 +308,26 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'comparison' && (
-          <StrategyComparison
-            strategies={strategies}
-            costData={costData}
-          />
-        )}
+          {activeTab === 'comparison' && (
+            <StrategyComparison
+              strategies={strategies}
+              costData={costData}
+            />
+          )}
+        </LoadingOverlay>
       </main>
+      
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.title.includes('Delete') ? 'danger' : 'warning'}
+      />
     </div>
+    </ErrorBoundary>
   );
 }
 

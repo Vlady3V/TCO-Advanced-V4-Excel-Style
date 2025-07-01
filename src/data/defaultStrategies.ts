@@ -185,29 +185,29 @@ export const defaultStrategies: Strategy[] = [
       }
     ],
     
-    // Wear rates (mm per 1000 hours)
+    // Wear rates (mm per 1000 hours) - FIXED: Stage 0 rate corrected to match Excel examples
     wearRates: {
       floor: 0.45,
-      stage0: 0,
-      stage1: 0.36,
-      stage2: 0.36,
+      stage0: 0.45, // FIXED: Was 0, should be 0.45 based on Excel analysis
+      stage1: 0.38, // FIXED: Was 0.36, should be 0.38 based on Excel examples
+      stage2: 0.26, // FIXED: Was 0.36, should be 0.26 based on Excel examples
       stage3: 0.18,
       stage4: 0.12
     },
     
-    // Cost structure
+    // Cost structure - FIXED: Based on Excel analysis, corrected material and labor costs
     costs: {
-      // Wear plate costs
-      stage4_20mm: 1140,
-      stage4_25mm: 1320,
-      stage3_20mm: 950,
-      stage3_25mm: 1100,
-      stage2_20mm: 760,
-      stage2_25mm: 880,
-      stage1_20mm: 570,
-      stage1_25mm: 660,
-      stage0_20mm: 380,
-      stage0_25mm: 440,
+      // Wear plate costs per tile (material only)
+      stage4_20mm: 5,  // FIXED: Base material cost from Excel
+      stage4_25mm: 8,  // FIXED: Base material cost from Excel
+      stage3_20mm: 5,  // FIXED: Base material cost from Excel
+      stage3_25mm: 8,  // FIXED: Base material cost from Excel
+      stage2_20mm: 5,  // FIXED: Base material cost from Excel
+      stage2_25mm: 8,  // FIXED: Base material cost from Excel
+      stage1_20mm: 5,  // FIXED: Base material cost from Excel
+      stage1_25mm: 8,  // FIXED: Base material cost from Excel
+      stage0_20mm: 5,  // FIXED: Base material cost from Excel
+      stage0_25mm: 8,  // FIXED: Base material cost from Excel
       
       // Quantities
       stage4Qty: 60,
@@ -224,13 +224,13 @@ export const defaultStrategies: Strategy[] = [
       frontwallCost: 20000,
       rebuildCost: 0,
       
-      // Labor
-      laborRate: 120,
-      laborWP20mm: 5,
-      laborWP25mm: 8,
-      laborSidewall: 520,
-      laborFrontwall: 640,
-      laborRebuild: 1200
+      // Labor (minutes per tile for WP, hours for major maintenance)
+      laborRate: 120,           // $/hour
+      laborWP20mm: 7,          // FIXED: 7 minutes per tile from Excel
+      laborWP25mm: 7,          // FIXED: 7 minutes per tile from Excel
+      laborSidewall: 520,      // hours
+      laborFrontwall: 640,     // hours
+      laborRebuild: 1200       // hours
     }
   },
   {
@@ -427,19 +427,19 @@ export const defaultStrategies: Strategy[] = [
       stage4: 0.12
     },
     
-    // Cost structure (same as scenario 1)
+    // Cost structure - FIXED: Consistent with scenario 1 corrections
     costs: {
-      // Wear plate costs
-      stage4_20mm: 1140,
-      stage4_25mm: 1320,
-      stage3_20mm: 950,
-      stage3_25mm: 1100,
-      stage2_20mm: 760,
-      stage2_25mm: 880,
-      stage1_20mm: 570,
-      stage1_25mm: 660,
-      stage0_20mm: 380,
-      stage0_25mm: 440,
+      // Wear plate costs per tile (material only)
+      stage4_20mm: 5,  // FIXED: Base material cost from Excel
+      stage4_25mm: 8,  // FIXED: Base material cost from Excel
+      stage3_20mm: 5,  // FIXED: Base material cost from Excel
+      stage3_25mm: 8,  // FIXED: Base material cost from Excel
+      stage2_20mm: 5,  // FIXED: Base material cost from Excel
+      stage2_25mm: 8,  // FIXED: Base material cost from Excel
+      stage1_20mm: 5,  // FIXED: Base material cost from Excel
+      stage1_25mm: 8,  // FIXED: Base material cost from Excel
+      stage0_20mm: 5,  // FIXED: Base material cost from Excel
+      stage0_25mm: 8,  // FIXED: Base material cost from Excel
       
       // Quantities
       stage4Qty: 60,
@@ -456,13 +456,13 @@ export const defaultStrategies: Strategy[] = [
       frontwallCost: 20000,
       rebuildCost: 0,
       
-      // Labor
-      laborRate: 120,
-      laborWP20mm: 5,
-      laborWP25mm: 8,
-      laborSidewall: 520,
-      laborFrontwall: 640,
-      laborRebuild: 1200
+      // Labor (minutes per tile for WP, hours for major maintenance)
+      laborRate: 120,           // $/hour
+      laborWP20mm: 7,          // FIXED: 7 minutes per tile from Excel
+      laborWP25mm: 7,          // FIXED: 7 minutes per tile from Excel
+      laborSidewall: 520,      // hours
+      laborFrontwall: 640,     // hours
+      laborRebuild: 1200       // hours
     }
   }
 ];
