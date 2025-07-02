@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Plus, Trash2, Copy, Download, Upload, Calculator } from 'lucide-react';
+import { Plus, Trash2, Copy, Download, Upload, Calculator, FileSpreadsheet, FileDown } from 'lucide-react';
 import { Strategy } from './types';
 import { defaultStrategies } from './data/defaultStrategies';
 import { 
@@ -9,7 +9,9 @@ import {
   StrategyComparison,
   ErrorBoundary,
   LoadingOverlay,
-  ConfirmDialog
+  ConfirmDialog,
+  FormulaDisplay,
+  ValidationStatus
 } from './components';
 import { 
   calculateWearAccumulation, 
@@ -17,6 +19,7 @@ import {
   formatCurrency,
   formatNumber
 } from './utils/calculations';
+import { exportToExcel, importFromExcel, createExcelTemplate } from './utils/excelUtils';
 
 function App() {
   const [strategies, setStrategies] = useState<Strategy[]>(defaultStrategies);
@@ -120,6 +123,61 @@ function App() {
     }
   };
 
+  const exportToExcelFile = () => {
+    try {
+      exportToExcel(strategies);
+    } catch (error) {
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Export Error',
+        message: 'Failed to export to Excel. Please try again.',
+        onConfirm: () => {}
+      });
+    }
+  };
+
+  const importFromExcelFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        setIsCalculating(true);
+        const importedStrategies = await importFromExcel(file);
+        setStrategies(importedStrategies);
+        setSelectedStrategyIndex(0);
+        setConfirmDialog({
+          isOpen: true,
+          title: 'Import Successful',
+          message: `Successfully imported ${importedStrategies.length} strategy(ies) from Excel file.`,
+          onConfirm: () => {}
+        });
+      } catch (error) {
+        setConfirmDialog({
+          isOpen: true,
+          title: 'Excel Import Error',
+          message: `Failed to import Excel file: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure the file follows the correct template format.`,
+          onConfirm: () => {}
+        });
+      } finally {
+        setIsCalculating(false);
+      }
+    }
+    // Reset file input
+    event.target.value = '';
+  };
+
+  const downloadExcelTemplate = () => {
+    try {
+      createExcelTemplate();
+    } catch (error) {
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Template Error',
+        message: 'Failed to create Excel template. Please try again.',
+        onConfirm: () => {}
+      });
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50">
@@ -140,11 +198,11 @@ function App() {
                 className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <Download className="w-4 h-4" />
-                Export
+                Export JSON
               </button>
               <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors">
                 <Upload className="w-4 h-4" />
-                Import
+                Import JSON
                 <input
                   type="file"
                   accept=".json"
@@ -152,6 +210,30 @@ function App() {
                   className="hidden"
                 />
               </label>
+              <button
+                onClick={exportToExcelFile}
+                className="flex items-center gap-2 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                Export Excel
+              </button>
+              <label className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg cursor-pointer transition-colors">
+                <FileSpreadsheet className="w-4 h-4" />
+                Import Excel
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={importFromExcelFile}
+                  className="hidden"
+                />
+              </label>
+              <button
+                onClick={downloadExcelTemplate}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-lg transition-colors"
+              >
+                <FileDown className="w-4 h-4" />
+                Template
+              </button>
             </div>
           </div>
         </div>
@@ -294,6 +376,10 @@ function App() {
                 </div>
               </div>
             </div>
+
+            <ValidationStatus strategy={strategies[selectedStrategyIndex]} />
+
+            <FormulaDisplay strategy={strategies[selectedStrategyIndex]} />
 
             <WearProgressionChart
               data={wearData[selectedStrategyIndex]}

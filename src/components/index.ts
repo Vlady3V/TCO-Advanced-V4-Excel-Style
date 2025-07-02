@@ -8,3 +8,5 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { LoadingSpinner, LoadingOverlay } from './LoadingSpinner';
 export { ConfirmDialog } from './ConfirmDialog';
 export { FormField } from './FormField';
+export { FormulaDisplay } from './FormulaDisplay';
+export { ValidationStatus } from './ValidationStatus';

@@ -417,12 +417,12 @@ export const defaultStrategies: Strategy[] = [
       }
     ],
     
-    // Wear rates (mm per 1000 hours)
+    // Wear rates (mm per 1000 hours) - FIXED: Match Excel exactly
     wearRates: {
       floor: 0.45,
       stage0: 0.45,
-      stage1: 0.36,
-      stage2: 0.36,
+      stage1: 0.38, // FIXED: Should be 0.38 based on Excel analysis
+      stage2: 0.26, // FIXED: Should be 0.26 based on Excel analysis
       stage3: 0.18,
       stage4: 0.12
     },
